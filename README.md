@@ -29,7 +29,8 @@ Nessa seção explico por que contornar o uso de SDK(Integridade e Cadeia de Cus
 
 ### Fluxo de operação
 Esse diagrama de fluxo mostra a interação entre o microcontrolador e o Host. O P1 é um sistema de duas partes: o Firmware de Aquisição(rodando no RP2040) e o Script de Análise(rodando no Host Linux). O firmware no Pico(main.c) atuará como "Alvo" e "Agente de Extração". O fluxo de dados depende de duas hierarquias Mestre-Escravo distintas.
-[!Fluxo de Operação](.../diagramap1.svg)
+
+![Fluxo de Operação](P1-Engenheiro_Reverso/diagrama.png)
 ## Uso (Exemplo)
 
 ```bash
