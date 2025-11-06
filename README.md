@@ -35,9 +35,9 @@ Esse diagrama de fluxo mostra a interação entre o microcontrolador e o Host. O
 
 O objetivo do projeto é usar a Camada USB para comandar o RP2040 a executar uma extração forense de sua própria memória, utilizando a Camada SPI.
 
+![Fluxo de Operação](diagrama.png)
 
-
-##### Hierarquia SPI Mestre-Escravo
+#### Hierarquia SPI Mestre-Escravo
 
 O núcleo deste projeto é o acesso **bare-metal** à FLASH externa.
 
@@ -51,7 +51,7 @@ Nosso fluxo de operação, portanto, ignora o XIP e implementa o protocolo Mestr
 
 
 
-#### Fluxo de Aquisição (Passo a Passo)
+### Fluxo de Aquisição (Passo a Passo)
 
 1. **Comando (Host PC):** O script Python envia um comando de `"iniciar dump"` para o RP2040 através do protocolo de dump forense.
 2. **Recepção (RP2040):** O firmware `main.c`, rodando na RAM, recebe este comando.
@@ -66,7 +66,7 @@ Nosso fluxo de operação, portanto, ignora o XIP e implementa o protocolo Mestr
 Ao implementar diretamente o protocolo Mestre-Escravo do SPI, garantimos que o firmware está lendo a memória FLASH **byte por byte**, sem qualquer abstração, resultando em um **dump forense completo e confiável**.
 
 
-![Fluxo de Operação](diagrama.png)
+
 
 
 ## Uso (Exemplo)
