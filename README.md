@@ -28,9 +28,49 @@ Nessa seção explico por que contornar o uso de SDK(Integridade e Cadeia de Cus
 3. **Validação (`tools/verify_dump.py`):** Ao final da aquisição, o script host calcula o hash (SHA-256) da imagem recebida para validação de integridade.
 
 ### Fluxo de operação
-Esse diagrama de fluxo mostra a interação entre o microcontrolador e o Host. O P1 é um sistema de duas partes: o Firmware de Aquisição(rodando no RP2040) e o Script de Análise(rodando no Host Linux). O firmware no Pico(main.c) atuará como "Alvo" e "Agente de Extração". O fluxo de dados depende de duas hierarquias Mestre-Escravo distintas.
+Esse diagrama de fluxo mostra a interação entre o microcontrolador e o Host. O P1 é um sistema de duas partes: o Firmware de Aquisição(rodando no RP2040) e o Script de Análise(rodando no Host Linux). O firmware no Pico(main.c) atuará como "Alvo" e "Agente de Extração". O fluxo de dados depende de duas hierarquias Mestre-Escravo distintas:
 
-![Fluxo de Operação](P1-Engenheiro_Reverso/diagrama.png)
+# Fluxo de Operação do P1: Aquisição Forense da FLASH
+
+A arquitetura do P1 é um sistema de aquisição forense de duas camadas, onde o RP2040 atua simultaneamente como **Alvo** e **Agente de Extração**. O fluxo de dados depende de duas hierarquias Mestre-Escravo distintas:
+
+1. **Camada USB (Host ↔ Alvo):** Comunicação entre o Host PC e o RP2040.
+2. **Camada SPI (Alvo ↔ FLASH):** Comunicação entre o processador RP2040 e seu próprio chip de FLASH externa.
+
+O objetivo do projeto é usar a Camada USB para comandar o RP2040 a executar uma extração forense de sua própria memória, utilizando a Camada SPI.
+
+---
+
+## Hierarquia SPI Mestre-Escravo
+
+O núcleo deste projeto é o acesso **bare-metal** à FLASH externa.
+
+- **Processador RP2040 (CPU):** atua como **MESTRE SPI**.  
+- **Chip de FLASH Externa (W25Qxx):** atua como **ESCRAVO SPI**.
+
+Normalmente, o SDK do Pico e o bootloader abstraem essa relação usando um modo chamado **XIP (eXecute-In-Place)**, que faz a FLASH parecer memória comum.  
+Para uma aquisição forense, essa abstração não é aceitável, pois pode pular seções ou mascarar dados importantes.
+
+Nosso fluxo de operação, portanto, ignora o XIP e implementa o protocolo Mestre-Escravo manualmente.
+
+---
+
+## Fluxo de Aquisição (Passo a Passo)
+
+1. **Comando (Host PC):** O script Python envia um comando de `"iniciar dump"` para o RP2040 através do protocolo de dump forense.
+2. **Recepção (RP2040):** O firmware `main.c`, rodando na RAM, recebe este comando.
+3. **Acesso (RP2040 Mestre):** O firmware assume o controle direto do hardware SSI (controlador QSPI) do RP2040, escrevendo diretamente nos endereços de registradores mapeados em memória (MMIO).
+4. **Comando (SPI):** O RP2040 (Mestre) envia comandos SPI brutos (ex.: `"Read Data" - 0x03`) para o chip de FLASH (Escravo), especificando o endereço de memória a ser lido.
+5. **Resposta (SPI):** O chip de FLASH (Escravo) responde com os dados brutos pelo pino `MISO` (Master In, Slave Out).
+6. **Retransmissão (RP2040):** O firmware intercepta esses dados brutos e os retransmite imediatamente para o Host PC através da Camada USB.
+7. **Validação (Host PC):** O script Python recebe o fluxo de dados, reconstrói a imagem da FLASH e valida sua integridade.
+
+---
+
+Ao implementar diretamente o protocolo Mestre-Escravo do SPI, garantimos que o firmware está lendo a memória FLASH **byte por byte**, sem qualquer abstração, resultando em um **dump forense completo e confiável**.
+
+
+![Fluxo de Operação](diagrama.png)
 ## Uso (Exemplo)
 
 ```bash
