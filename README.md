@@ -30,10 +30,6 @@ Nessa seção explico por que contornar o uso de SDK(Integridade e Cadeia de Cus
 ### Fluxo de operação
 Esse diagrama de fluxo mostra a interação entre o microcontrolador e o Host. O P1 é um sistema de duas partes: o Firmware de Aquisição(rodando no RP2040) e o Script de Análise(rodando no Host Linux). O firmware no Pico(main.c) atuará como "Alvo" e "Agente de Extração". O fluxo de dados depende de duas hierarquias Mestre-Escravo distintas:
 
-# Fluxo de Operação do P1: Aquisição Forense da FLASH
-
-A arquitetura do P1 é um sistema de aquisição forense de duas camadas, onde o RP2040 atua simultaneamente como **Alvo** e **Agente de Extração**. O fluxo de dados depende de duas hierarquias Mestre-Escravo distintas:
-
 1. **Camada USB (Host ↔ Alvo):** Comunicação entre o Host PC e o RP2040.
 2. **Camada SPI (Alvo ↔ FLASH):** Comunicação entre o processador RP2040 e seu próprio chip de FLASH externa.
 
@@ -41,7 +37,7 @@ O objetivo do projeto é usar a Camada USB para comandar o RP2040 a executar uma
 
 ---
 
-## Hierarquia SPI Mestre-Escravo
+##### Hierarquia SPI Mestre-Escravo
 
 O núcleo deste projeto é o acesso **bare-metal** à FLASH externa.
 
@@ -55,7 +51,7 @@ Nosso fluxo de operação, portanto, ignora o XIP e implementa o protocolo Mestr
 
 ---
 
-## Fluxo de Aquisição (Passo a Passo)
+#### Fluxo de Aquisição (Passo a Passo)
 
 1. **Comando (Host PC):** O script Python envia um comando de `"iniciar dump"` para o RP2040 através do protocolo de dump forense.
 2. **Recepção (RP2040):** O firmware `main.c`, rodando na RAM, recebe este comando.
@@ -71,6 +67,8 @@ Ao implementar diretamente o protocolo Mestre-Escravo do SPI, garantimos que o f
 
 
 ![Fluxo de Operação](diagrama.png)
+
+
 ## Uso (Exemplo)
 
 ```bash
