@@ -62,10 +62,10 @@ void ssi_init(void)
    
 }
 
-// func que faz a aquisição da FLASH
+// funcao que faz a aquisição da FLASH
 uint8_t ssi_read_byte(uint32_t address)
 {
-   // envio do comando Fast Read
+   // Envio do comando Fast Read
    while ( !(SR & SR_TFNF) )
    {
       // espera TX
@@ -73,27 +73,28 @@ uint8_t ssi_read_byte(uint32_t address)
 
    DR0 = 0x0B; // saiu, tem espaço
    
+   // Envia os bits 23-16(byte 1)
    while ( !(SR & SR_TFNF))
    {
       
 
    }
-
-   DR0 = (address >> 16) & 0xFF; // envia os bits 23-16(byte 1)
+   DR0 = (address >> 16) & 0xFF; 
    
-
+   // 3. Envia os bits 15-8(byte 2)
    while ( !(SR & SR_TFNF))
    {
       
    }
-
-   DR0 = (address >> 8) & 0xFF; // envia os bits 15-8(byte 2)
+   DR0 = (address >> 8) & 0xFF; 
    
+   
+   // 4. Envia os bits 7-0(byte 3)
    while ( !(SR & SR_TFNF))
    {
 
    }
-   DR0 = address & 0xFF; // envia os bits 7-0(byte 3)
+   DR0 = address & 0xFF; 
    
    
    
@@ -137,18 +138,17 @@ void uart_init(void)
    GPIO1_CTRL = FUNC_UART0;
    
 
-   // baud rate e control register
+   // baud rate e control register(incompleto)
 }
 
 
 
 
-
+// program principal
 int main(void)
 {
 
-  uart_init;
-
+  // incompleto
 
 
 
