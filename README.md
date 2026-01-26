@@ -63,9 +63,9 @@ O projeto segue cronograma de Sprints quinzenais.
 
 ### 🚧 Fase 1: Fundação da Sonda (Sprint Atual)
 - [x] Setup do ambiente CMake + TinyUSB.
-- [ ] [cite_start]**Kill Switch:** Controle físico do pino RUN do alvo.
-- [ ] [cite_start]**USB Echo:** Validação do pipeline de comunicação PC <-> Sonda.
-- [ ] [cite_start]**SWD PHY:** Implementação das primitivas `WriteBit`, `ReadBit` e `Turnaround`.
+- [ ] **Kill Switch:** Controle físico do pino RUN do alvo.
+- [ ] **USB Echo:** Validação do pipeline de comunicação PC <-> Sonda.
+- [ ] **SWD PHY:** Implementação das primitivas `WriteBit`, `ReadBit` e `Turnaround`.
 
 ### 🔜 Próximos Passos (Sprints 2-5)
 - Implementação da Máquina de Estados do Protocolo SWD.
