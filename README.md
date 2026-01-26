@@ -12,7 +12,7 @@ O **P1** é uma ferramenta de aquisição forense *bare-metal* (híbrida) projet
 
 ## 🎯 Objetivo Técnico
 
-O objetivo final é transformar um Raspberry Pi Pico (Sonda) em um extrator capaz de realizar o dump de **2MB de Flash em < 60 segundos**[cite: 6, 32], validando a integridade via SHA256, sem executar código residente no dispositivo Alvo.
+O objetivo final é transformar um Raspberry Pi Pico (Sonda) em um extrator capaz de realizar o dump de **2MB de Flash em < 60 segundos**, validando a integridade via SHA256, sem executar código residente no dispositivo Alvo.
 
 ### 🏗️ Arquitetura Híbrida
 Para maximizar a eficiência de aprendizado e a performance profissional, o projeto adota uma arquitetura mista[cite: 18]:
