@@ -18,7 +18,7 @@ O objetivo final é transformar um Raspberry Pi Pico (Sonda) em um extrator capa
 Para maximizar a eficiência de aprendizado e a performance profissional, o projeto adota uma arquitetura mista[cite: 18]:
 
 1. **Camada Física (Custom PHY):** Implementação manual ("bit-banging") do protocolo SWD para controle preciso dos tempos de sinal e manipulação do DAP (Debug Access Port).
-2.  **Transporte (High-Level):** Utilização do **TinyUSB (CDC)** do Pico SDK para exfiltração de dados em alta velocidade para o host (PC)[cite: 22].
+2.  **Transporte (High-Level):** Utilização do **TinyUSB (CDC)** do Pico SDK para exfiltração de dados em alta velocidade para o host (PC).
 3.  **Controle de Hardware:** Manipulação direta de GPIOs para *Target Reset* (Kill Switch) e *Power Glitching* (futuro).
 
 ---
@@ -63,8 +63,8 @@ O projeto segue cronograma de Sprints quinzenais.
 
 ### 🚧 Fase 1: Fundação da Sonda (Sprint Atual)
 - [x] Setup do ambiente CMake + TinyUSB.
-- [ ] [cite_start]**Kill Switch:** Controle físico do pino RUN do alvo[cite: 57].
-- [ ] [cite_start]**USB Echo:** Validação do pipeline de comunicação PC <-> Sonda[cite: 54].
+- [ ] [cite_start]**Kill Switch:** Controle físico do pino RUN do alvo.
+- [ ] [cite_start]**USB Echo:** Validação do pipeline de comunicação PC <-> Sonda.
 - [ ] [cite_start]**SWD PHY:** Implementação das primitivas `WriteBit`, `ReadBit` e `Turnaround`.
 
 ### 🔜 Próximos Passos (Sprints 2-5)
