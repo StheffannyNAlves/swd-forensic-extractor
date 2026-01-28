@@ -1,5 +1,6 @@
 .cpu cortex-m0plus
 .thumb
+.syntax unified
 .global _reset
 .global vectors
 
