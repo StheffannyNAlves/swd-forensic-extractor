@@ -55,6 +55,8 @@
 #define UART0_CR      *(volatile uint32_t *) (UART0_BASE + 0x030) // Control
 #define TXFF_BIT      (1 << 5) // buffer cheio
 
+#define CLK_PERI  12000000
+#define BAUD_RATE 115200
 
 // inicializa o cristal de 12mhz e troca o clock do sistema
 void xosc_init(void)
@@ -77,10 +79,9 @@ void uart_init(void)
     GPIO0_CTRL = FUNC_UART;
     GPIO1_CTRL = FUNC_UART;
     
-    const uint32_t clk_peri = 12000000; 
-    const uint32_t baud_rate = 115200;
+   
 
-    uint32_t div_x64 = ((clk_peri * 4) + (baud_rate / 2)) / baud_rate;
+    uint32_t div_x64 = ((CLK_PERI * 4) + (BAUD_RATE / 2)) / BAUD_RATE;
 
     UART0_CR = 0; // desabilita pra configurar
     
