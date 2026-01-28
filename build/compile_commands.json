@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/build",
+  "command": "arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -std=c11 -Wall -O0 -g -nostdlib -g -o CMakeFiles/firmware.elf.dir/src/main.c.o -c /home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/src/main.c",
+  "file": "/home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/src/main.c",
+  "output": "CMakeFiles/firmware.elf.dir/src/main.c.o"
+},
+{
+  "directory": "/home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/build",
+  "command": "arm-none-eabi-gcc -mcpu=cortex-m0plus -mthumb -g -g -o CMakeFiles/firmware.elf.dir/src/start.s.o -c /home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/src/start.s",
+  "file": "/home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/src/start.s",
+  "output": "CMakeFiles/firmware.elf.dir/src/start.s.o"
+}
+]

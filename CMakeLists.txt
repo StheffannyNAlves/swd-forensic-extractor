@@ -33,5 +33,5 @@ add_custom_command(TARGET firmware.elf POST_BUILD
 
 add_custom_command(TARGET firmware.elf POST_BUILD
     COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/maker.py firmware.bin firmware.uf2
-    COMMENT "Empacotando UF2 com Boot2..."
+    COMMENT "Empacotando UF2 com Boot2"
 )
