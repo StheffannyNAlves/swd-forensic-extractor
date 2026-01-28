@@ -1,0 +1,50 @@
+name: Build Bare-Metal Research
+
+# Gatilhos: Roda em pushes na main ou na branch research
+on:
+  push:
+    branches: [ "main", "research" ]
+  pull_request:
+    branches: [ "main", "research" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Baixa seu código
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    # 2. Instala o compilador ARM GCC (Cross-Toolchain)
+    - name: Install Arm GNU Toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi
+    # 3. Instala CMake e Ninja (sistema de build rápido)
+    - name: Install Build Tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build python3
+
+    # 4. Prepara a pasta de build
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G Ninja
+
+    # 5. Compila tudo (Gera o .elf, .bin e chama o maker.py para o .uf2)
+    - name: Build Firmware
+      working-directory: build
+      run: ninja
+
+    # 6. Salva os arquivos gerados para você baixar no site do GitHub
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-bare-metal
+        path: |
+          build/firmware.elf
+          build/firmware.bin
+          build/firmware.uf2
