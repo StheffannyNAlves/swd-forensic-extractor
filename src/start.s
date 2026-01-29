@@ -8,7 +8,7 @@
 .align 2
 vectors:
     .word _stack_top   /* Stack Pointer */
-    .word _reset       /* Reset Handler */
+    .word _reset + 1
 
 .section .text
 .thumb_func        
