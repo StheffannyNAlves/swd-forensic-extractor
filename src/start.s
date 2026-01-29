@@ -4,14 +4,16 @@
 .global _reset
 .global vectors
 
+/* Tabela de Vetores */
 .section .vectors, "ax"
 .align 2
 vectors:
-    .word _stack_top   /* Stack Pointer */
-    .word _reset + 1
+    .word _stack_top
+    .word _reset + 1     /* Adiciona 1 manualmente para forçar modo Thumb */
 
+/* Código de inicialização */
 .section .text
-.thumb_func        
+/* .thumb_func REMOVIDO: Evita somar +1 duas vezes */
 .type _reset, %function
 _reset:
     ldr r0, =_stack_top

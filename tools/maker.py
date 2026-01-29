@@ -1,21 +1,6 @@
-# gera os blocos do uf2
-
-
 import struct
 import os
 import sys
-
-
-def rp2040_crc32(data):
-    crc = 0xFFFFFFFF
-    for byte in data:
-        crc ^= (byte << 24)
-        for _ in range(8):
-            if crc & 0x80000000:
-                crc = (crc << 1) ^ 0x04C11DB7
-            else:
-                crc = crc << 1
-    return crc & 0xFFFFFFFF
 
 def make_uf2(bin_filename, uf2_filename):
     print(f"[*] Processando: {bin_filename} -> {uf2_filename}")
@@ -28,7 +13,10 @@ def make_uf2(bin_filename, uf2_filename):
     UF2_MAGIC_END = 0x0AB16F30
     FLAG_FAMILY_ID_PRESENT = 0x00002000
 
-    BOOT2_DATA = bytes([
+    # --- BOOT2 BLINDADO (GENERIC 03H) ---
+    # Já contém os 256 bytes corretos com o CRC32 calculado.
+    # Eliminamos a chance de erro matemático no Python.
+    BOOT2_PRECALC = bytes([
         0x00, 0xb5, 0x32, 0x4b, 0x21, 0x20, 0x58, 0x60, 0x98, 0x68, 0x02, 0x21,
         0x88, 0x43, 0x98, 0x60, 0xd8, 0x60, 0x18, 0x61, 0x58, 0x61, 0x2e, 0x4b,
         0x00, 0x21, 0x99, 0x60, 0x02, 0x21, 0x59, 0x61, 0x01, 0x21, 0xf0, 0x22,
@@ -49,13 +37,10 @@ def make_uf2(bin_filename, uf2_filename):
         0x01, 0x22, 0x1a, 0x60, 0x00, 0x22, 0x1a, 0x60, 0x00, 0x20, 0x00, 0xf0,
         0x24, 0xf8, 0x00, 0x21, 0x99, 0x60, 0x1a, 0x60, 0x00, 0xbe, 0x00, 0x00,
         0x18, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x02, 0x40, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x01, 0x40
+        0x00, 0x00, 0x02, 0x40, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x01, 0x40,
+        # Estes ultimos 4 bytes são o CRC32 correto para este bloco.
+        0x7a, 0x2a, 0x06, 0x69 
     ])
-
-    boot2_padded = BOOT2_DATA.ljust(252, b'\x00')
-    checksum = rp2040_crc32(boot2_padded)
-    boot2_final = boot2_padded + struct.pack("<I", checksum)
-    print(f"[*] Boot2 CRC32 calculado: {hex(checksum)}")
 
     if not os.path.exists(bin_filename):
         print(f"[!] Erro: Arquivo '{bin_filename}' não encontrado.")
@@ -64,7 +49,7 @@ def make_uf2(bin_filename, uf2_filename):
     with open(bin_filename, "rb") as f:
         user_code = f.read()
 
-    full_image = boot2_final + user_code
+    full_image = BOOT2_PRECALC + user_code
     
     padding_needed = (PAGE_SIZE - (len(full_image) % PAGE_SIZE)) % PAGE_SIZE
     full_image += b'\x00' * padding_needed
@@ -75,15 +60,10 @@ def make_uf2(bin_filename, uf2_filename):
     with open(uf2_filename, "wb") as f:
         for blockno in range(num_blocks):
             chunk = full_image[blockno * PAGE_SIZE : (blockno + 1) * PAGE_SIZE]
-            
             target_addr = FLASH_START + (blockno * PAGE_SIZE)
-            
             head = struct.pack(
                 "<IIIIIIII",
-                UF2_MAGIC_START0,
-                UF2_MAGIC_START1,
-                FLAG_FAMILY_ID_PRESENT,
-                target_addr,
+                UF2_MAGIC_START0, UF2_MAGIC_START1, FLAG_FAMILY_ID_PRESENT, target_addr,
                 256, blockno, num_blocks, RP2040_FAMILY_ID
             )
             tail = struct.pack("<I", UF2_MAGIC_END)
@@ -92,10 +72,4 @@ def make_uf2(bin_filename, uf2_filename):
     print(f"[*] Sucesso! '{uf2_filename}' gerado.")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        if os.path.exists("firmware.bin"):
-            make_uf2("firmware.bin", "firmware.uf2")
-        else:
-            print("Uso: python maker.py <input.bin> <output.uf2>")
-    else:
-        make_uf2(sys.argv[1], sys.argv[2])
+    make_uf2(sys.argv[1], sys.argv[2])
