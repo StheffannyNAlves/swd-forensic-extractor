@@ -9,7 +9,7 @@
 .align 2
 vectors:
     .word _stack_top
-    .word _reset + 1     
+    .word _reset  
 
 /* Código de inicialização */
 .section .text
