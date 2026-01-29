@@ -7,10 +7,11 @@
 .section .vectors, "ax"
 .align 2
 vectors:
-    .word _stack_top
-    .word _reset
+    .word _stack_top   /* Stack Pointer */
+    .word _reset       /* Reset Handler */
 
 .section .text
+.thumb_func        
 .type _reset, %function
 _reset:
     ldr r0, =_stack_top
@@ -19,7 +20,7 @@ _reset:
     ldr r0, =_sdata
     ldr r1, =_edata
     ldr r2, =_sidata
-
+    
 loop_copy_data:
     cmp r0, r1
     bge init_bss
@@ -33,7 +34,6 @@ init_bss:
     ldr r0, =_sbss
     ldr r1, =_ebss
     movs r2, #0
-
 loop_bss:
     cmp r0, r1
     bge call_main
@@ -43,6 +43,9 @@ loop_bss:
 
 call_main:
     bl main
-
+    
 hang:
     b hang
+
+.word _sbss
+.word _ebss

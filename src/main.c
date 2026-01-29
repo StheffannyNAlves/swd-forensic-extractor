@@ -12,28 +12,21 @@
 
 #define GPIO25_CTRL   *(volatile uint32_t *) (IO_BANK0_BASE + 0x0CC)
 #define GPIO_OE_SET   *(volatile uint32_t *) (SIO_BASE + 0x024)
-#define GPIO_OUT_XOR  *(volatile uint32_t *) (SIO_BASE + 0x01C)
+#define GPIO_OUT_SET  *(volatile uint32_t *) (SIO_BASE + 0x014) // Usando SET em vez de XOR
 
 #define FUNC_SIO      5
 #define LED           25
 
-void delay_fuleiro(void) {
-    for (volatile int i = 0; i < 200000; i++); 
-}
-
 int main(void) {
-   
     uint32_t mascara_reset = RST_IO_BANK0 | RST_PADS_BANK0;
-    
     RESETS_RESET &= ~mascara_reset;
-    
     while ((RESETS_RESET_DONE & mascara_reset) != mascara_reset);
 
     GPIO25_CTRL = FUNC_SIO;
-    GPIO_OE_SET = (1 << LED);
     
-    while (1) {
-        GPIO_OUT_XOR = (1 << LED); 
-        delay_fuleiro();
-    }
+    GPIO_OE_SET = (1 << LED);  
+    GPIO_OUT_SET = (1 << LED); 
+    
+    
+    while (1);
 }
