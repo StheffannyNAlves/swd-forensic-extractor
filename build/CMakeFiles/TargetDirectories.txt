@@ -1,0 +1,3 @@
+/home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/build/CMakeFiles/firmware.elf.dir
+/home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/build/CMakeFiles/edit_cache.dir
+/home/stheffanny/Documentos/Github/P1-Engenheiro_Reverso/build/CMakeFiles/rebuild_cache.dir
