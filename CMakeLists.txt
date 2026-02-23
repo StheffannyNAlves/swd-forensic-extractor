@@ -17,6 +17,7 @@ set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/linker/memmap.ld")
 set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} -nostdlib -Wl,--gc-sections")
 
 set(SOURCES 
+    src/boot2_w25q080.S
     src/main.c 
     src/start.s
 )

@@ -11,7 +11,7 @@
 #define UART0_BASE    0x40034000
 #define SIO_BASE      0xd0000000 
 
-//XOSC 
+
 #define XOSC_CTRL     *(volatile uint32_t *) (XOSC_BASE + 0x00)
 #define XOSC_STATUS   *(volatile uint32_t *) (XOSC_BASE + 0x04)
 #define XOSC_STARTUP  *(volatile uint32_t *) (XOSC_BASE + 0x0C)
@@ -21,7 +21,7 @@
 #define CMD_ENABLE    0xB
 #define STABLE_BIT    (1 << 31)
 
-// clocks 
+
 #define CLK_REF_CTRL  *(volatile uint32_t *) (CLOCKS_BASE + 0x30)
 #define CLK_SYS_CTRL  *(volatile uint32_t *) (CLOCKS_BASE + 0x3C)
 #define SRC_XOSC      2 
@@ -36,7 +36,7 @@
 #define RST_IO_BANK0   (1 << 5)
 #define RST_PADS_BANK0 (1 << 8)
 
-// GPIO & IO Bank
+
 #define GPIO0_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x004) // Tx
 #define GPIO1_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x00c) // Rx
 #define GPIO25_CTRL   *(volatile uint32_t *) (IO_BANK0_BASE + 0x0CC) // LED
@@ -106,8 +106,8 @@ void uart_putc(char data)
 
 int main(void)
 {
-    xosc_init();
-    uart_init();
+    // xosc_init();
+    // uart_init();
     
     // config led
     GPIO25_CTRL = FUNC_SIO;
@@ -115,8 +115,8 @@ int main(void)
 
     while (1)
     {
-        uart_putc('U');
+        /*uart_putc('U'); */ 
         GPIO_OUT_XOR = (1 << LED); // pisca led
-        for (volatile int i = 0; i < 500000; i++); 
+        for (volatile int i = 0; i < 500000; i++);
     }
 }
