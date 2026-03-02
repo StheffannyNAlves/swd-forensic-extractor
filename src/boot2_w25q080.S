@@ -26,10 +26,44 @@
 //                4-byte checksum. Therefore code size cannot exceed 252 bytes.
 // ----------------------------------------------------------------------------
 
-#include "pico/asm_helper.S"
-#include "hardware/regs/addressmap.h"
-#include "hardware/regs/ssi.h"
-#include "hardware/regs/pads_qspi.h"
+.equ SSI_BASE,                0x18000000
+
+.equ SSI_CTRLR0_OFFSET,       0x000
+.equ SSI_SSIENR_OFFSET,       0x008
+.equ SSI_BAUDR_OFFSET,        0x014
+.equ SSI_TXFLR_OFFSET,        0x020
+.equ SSI_RXFLR_OFFSET,        0x024
+.equ SSI_SR_OFFSET,           0x028
+.equ SSI_DR0_OFFSET,          0x060
+.equ SSI_SPI_CTRLR0_OFFSET,   0x0F4
+
+.equ SSI_CTRLR0,      SSI_BASE + SSI_CTRLR0_OFFSET
+.equ SSI_SSIENR,      SSI_BASE + SSI_SSIENR_OFFSET
+.equ SSI_BAUDR,       SSI_BASE + SSI_BAUDR_OFFSET
+.equ SSI_DR0,         SSI_BASE + SSI_DR0_OFFSET
+.equ SSI_SPI_CTRLR0,  SSI_BASE + SSI_SPI_CTRLR0_OFFSET
+
+.equ PADS_QSPI_BASE,          0x40020000
+
+.equ PADS_QSPI_SCLK_OFFSET,   0x000
+.equ PADS_QSPI_SD0_OFFSET,    0x004
+.equ PADS_QSPI_SD1_OFFSET,    0x008
+.equ PADS_QSPI_SD2_OFFSET,    0x00C
+.equ PADS_QSPI_SD3_OFFSET,    0x010
+.equ PADS_QSPI_SS_OFFSET,     0x014
+
+.equ XIP_CTRL_BASE,           0x14000000
+
+.equ XIP_CTRL_OFFSET,         0x000
+.equ XIP_FLUSH_OFFSET,        0x004
+
+.equ XIP_CTRL,        XIP_CTRL_BASE + XIP_CTRL_OFFSET
+.equ XIP_FLUSH,       XIP_CTRL_BASE + XIP_FLUSH_OFFSET
+
+.equ CMD_READ_STATUS,     0x05
+.equ CMD_WRITE_ENABLE,    0x06
+.equ CMD_FAST_READ_QUAD,  0xEB
+
 
 // ----------------------------------------------------------------------------
 // Config section
@@ -86,7 +120,6 @@
 // Start of 2nd Stage Boot Code
 // ----------------------------------------------------------------------------
 
-.section .boot2, "ax"
 
 pico_default_asm_setup
 

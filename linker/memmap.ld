@@ -2,13 +2,18 @@ ENTRY(_reset)
 
 MEMORY
 {
-    FLASH(rx) : ORIGIN = 0x10000100, LENGTH = 2048k - 256
+    FLASH(rx) : ORIGIN = 0x10000000, LENGTH = 2048k
     RAM(rwx)  : ORIGIN = 0x20000000, LENGTH = 264k
 }
 
 SECTIONS
 {
-    .text :
+    .boot2 ORIGIN(FLASH) :
+    {
+        KEEP(*(.boot2))
+    } > FLASH
+    
+    .text 0x10000100 :
     {
         KEEP(*(.vectors))
         *(.text*)
@@ -39,3 +44,4 @@ SECTIONS
 
     _stack_top = ORIGIN(RAM) + LENGTH(RAM);
 }
+
