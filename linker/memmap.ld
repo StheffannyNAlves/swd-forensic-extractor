@@ -8,10 +8,10 @@ MEMORY
 
 SECTIONS
 {
-    .boot2 ORIGIN(FLASH) :
+    .boot2 0x10000000 :
     {
         KEEP(*(.boot2))
-        . = ORIGIN(FLASH) + 0x100
+        . = 0x100
     } > FLASH
     
     .text 0x10000100 :

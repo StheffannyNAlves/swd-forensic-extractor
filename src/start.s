@@ -12,10 +12,10 @@ vectors:
     .word _reset  
 
 /* Código de inicialização */
-.section .text
+.section .text, "ax"
 .type _reset, %function
 _reset:
-    ldr r0, =_stack_top
+    ldr sp, =_stack_top
     mov sp, r0
 
     ldr r0, =_sdata
