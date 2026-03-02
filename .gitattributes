@@ -1,2 +1,3 @@
-tools/maker.py linguist-vendored
-tools/test_uart.py linguist-vendored
+# Ignora scripts utilitários no cálculo de linguagem
+tools/* linguist-vendored
+*.py linguist-vendored
