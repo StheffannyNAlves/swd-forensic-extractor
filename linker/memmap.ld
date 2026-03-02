@@ -11,6 +11,7 @@ SECTIONS
     .boot2 ORIGIN(FLASH) :
     {
         KEEP(*(.boot2))
+        . = ORIGIN(FLASH) + 0x100
     } > FLASH
     
     .text 0x10000100 :
