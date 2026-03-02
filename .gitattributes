@@ -1,0 +1,3 @@
+# Ignora scripts utilitários no cálculo de linguagem
+tools/* linguist-vendored
+*.py linguist-vendored
