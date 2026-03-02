@@ -2,6 +2,7 @@
 
 
 import struct
+import sys
 
 
 def rp2040_crc32(data):
@@ -43,6 +44,6 @@ def gera_boot2(raw_bin, output_s):
             f.write(f"    .byte {bytes_str}\n")
 
 if __name__ == "__main__":
-    gera_boot2("boot2.bin", "boot2_gerado.S")
+    gera_boot2(sys.argv[1], sys.argv[2])
     
   
