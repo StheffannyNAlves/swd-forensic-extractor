@@ -16,8 +16,7 @@ vectors:
 .type _reset, %function
 _reset:
     ldr sp, =_stack_top
-    mov sp, r0
-
+    
     ldr r0, =_sdata
     ldr r1, =_edata
     ldr r2, =_sidata
@@ -48,5 +47,4 @@ call_main:
 hang:
     b hang
 
-.word _sbss
-.word _ebss
+
