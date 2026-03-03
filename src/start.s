@@ -15,8 +15,9 @@ vectors:
 .section .text, "ax"
 .type _reset, %function
 _reset:
-    ldr sp, =_stack_top
-    
+    ldr r0, =_stack_top
+    mov sp, r0
+
     ldr r0, =_sdata
     ldr r1, =_edata
     ldr r2, =_sidata
