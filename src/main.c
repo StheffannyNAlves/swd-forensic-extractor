@@ -106,17 +106,20 @@ void uart_putc(char data)
 
 int main(void)
 {
+    uint32_t rst = (RST_IO_BANK0 | RST_PADS_BANK0);
+    RESETS_RESET &= ~rst;
+    while ((RESETS_RESET_DONE & rst) != rst);
     // xosc_init();
     // uart_init();
     
     // config led
     GPIO25_CTRL = FUNC_SIO;
-    GPIO_OE_SET = (1 << LED); 
+    GPIO_OE_SET = (1u << LED); 
 
     while (1)
     {
         /*uart_putc('U'); */ 
-        GPIO_OUT_XOR = (1 << LED); // pisca led
+        GPIO_OUT_XOR = (1u << LED); // pisca led
         for (volatile int i = 0; i < 500000; i++);
     }
 }
