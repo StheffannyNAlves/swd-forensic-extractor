@@ -109,8 +109,8 @@ int main(void)
     uint32_t rst = (RST_IO_BANK0 | RST_PADS_BANK0);
     RESETS_RESET &= ~rst;
     while ((RESETS_RESET_DONE & rst) != rst);
-    // xosc_init();
-    // uart_init();
+    /*xosc_init();*/
+    uart_init();
     
     // config led
     GPIO25_CTRL = FUNC_SIO;
@@ -118,7 +118,7 @@ int main(void)
 
     while (1)
     {
-        /*uart_putc('U'); */ 
+        uart_putc('U'); 
         GPIO_OUT_XOR = (1u << LED); // pisca led
         for (volatile int i = 0; i < 500000; i++);
     }
