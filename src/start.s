@@ -11,7 +11,6 @@ vectors:
     .word _stack_top
     .word _reset  
 
-/* Código de inicialização */
 .section .text, "ax"
 .type _reset, %function
 _reset:

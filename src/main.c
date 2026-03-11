@@ -106,9 +106,7 @@ void uart_putc(char data)
 
 int main(void)
 {
-    uint32_t rst = (RST_IO_BANK0 | RST_PADS_BANK0);
-    RESETS_RESET &= ~rst;
-    while ((RESETS_RESET_DONE & rst) != rst);
+  
     /*xosc_init();*/
     uart_init();
     
