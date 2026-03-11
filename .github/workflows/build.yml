@@ -3,9 +3,9 @@ name: Build Bare-Metal Research
 # Gatilhos: Roda em pushes na main ou na branch research
 on:
   push:
-    branches: [ "main", "research" ]
+    branches: [ "research" ]
   pull_request:
-    branches: [ "main", "research" ]
+    branches: ["research" ]
 
 jobs:
   build:
