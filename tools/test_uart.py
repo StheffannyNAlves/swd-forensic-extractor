@@ -4,7 +4,7 @@
 import serial 
 import sys
 
-PORTA = '/dev/ttyACM0' 
+PORTA = '/dev/ttyUSB0' 
 
 
 try:

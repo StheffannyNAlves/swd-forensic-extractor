@@ -55,7 +55,7 @@
 #define UART0_CR      *(volatile uint32_t *) (UART0_BASE + 0x030) // Control
 #define TXFF_BIT      (1 << 5) // buffer cheio
 
-#define CLK_PERI  12000000
+#define CLK_PERI  12500000
 #define BAUD_RATE 115200
 
 // inicializa o cristal de 12mhz e troca o clock do sistema
@@ -106,18 +106,16 @@ void uart_putc(char data)
 
 int main(void)
 {
-  
-    /*xosc_init();*/
-    uart_init();
-    
-    // config led
+    uint32_t rst = (RST_IO_BANK0 | RST_PADS_BANK0);
+    RESETS_RESET &= ~rst;
+    while ((RESETS_RESET_DONE & rst) != rst);
+
     GPIO25_CTRL = FUNC_SIO;
-    GPIO_OE_SET = (1u << LED); 
+    GPIO_OE_SET = (1u << LED);
 
     while (1)
     {
-        uart_putc('U'); 
-        GPIO_OUT_XOR = (1u << LED); // pisca led
-        for (volatile int i = 0; i < 500000; i++);
+        GPIO_OUT_XOR = (1u << LED);
+        for (volatile uint32_t i = 0; i < 5000000; i++);
     }
 }
