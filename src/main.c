@@ -70,30 +70,18 @@ void xosc_init(void)
 
 void uart_init(void)
 {
-    // tira do reset
-    uint32_t rst_mascara = (RST_UART0 | RST_IO_BANK0 | RST_PADS_BANK0);
-    RESETS_RESET &= ~rst_mascara;
-    while ((RESETS_RESET_DONE & rst_mascara) != rst_mascara);
-
-    // configura pinos (mux)
+    RESETS_RESET &= ~RST_UART0;
+   
     GPIO0_CTRL = FUNC_UART;
     GPIO1_CTRL = FUNC_UART;
-    
-   
 
     uint32_t div_x64 = ((CLK_PERI * 4) + (BAUD_RATE / 2)) / BAUD_RATE;
 
-    UART0_CR = 0; // desabilita pra configurar
-    
-    // ponto fixo
-    UART0_IBRD = div_x64 >> 6;       
-    UART0_FBRD = div_x64 & 0x3F;    
-
-    // 8 bits, fifo habilitada
-    UART0_LCR_H = (1 << 4) | (3 << 5); 
-
-    // ativa uart, tx e rx
-    UART0_CR = (1 << 0) | (1 << 8) | (1 << 9); 
+    UART0_CR = 0;
+    UART0_IBRD = div_x64 >> 6;
+    UART0_FBRD = div_x64 & 0x3F;
+    UART0_LCR_H = (1 << 4) | (3 << 5);
+    UART0_CR = (1 << 0) | (1 << 8) | (1 << 9);
 }
 
 // envio de char (bloqueante)
@@ -106,15 +94,19 @@ void uart_putc(char data)
 
 int main(void)
 {
+    
     uint32_t rst = (RST_IO_BANK0 | RST_PADS_BANK0);
     RESETS_RESET &= ~rst;
     while ((RESETS_RESET_DONE & rst) != rst);
 
     GPIO25_CTRL = FUNC_SIO;
     GPIO_OE_SET = (1u << LED);
-
+    
+    uart_init();
+    
     while (1)
     {
+        uart_putc('U');
         GPIO_OUT_XOR = (1u << LED);
         for (volatile uint32_t i = 0; i < 5000000; i++);
     }
