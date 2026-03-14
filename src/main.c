@@ -1,5 +1,3 @@
-// prova que a comunicação uart funciona, não tá 100% certo
-
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h> 
@@ -17,7 +15,7 @@
 #define XOSC_STARTUP  *(volatile uint32_t *) (XOSC_BASE + 0x0C)
 
 // valores magicos / senhas
-#define XOSC_ENABLE   0xFABAA000
+#define XOSC_ENABLE   0xFABAA0
 #define CMD_ENABLE    0xB
 #define STABLE_BIT    (1 << 31)
 
@@ -54,8 +52,9 @@
 #define UART0_LCR_H   *(volatile uint32_t *) (UART0_BASE + 0x02c) // Line Control
 #define UART0_CR      *(volatile uint32_t *) (UART0_BASE + 0x030) // Control
 #define TXFF_BIT      (1 << 5) // buffer cheio
+#define RXFE_BIT      (1 << 4)
 
-#define CLK_PERI  12500000
+#define CLK_PERI  12000000
 #define BAUD_RATE 115200
 
 // inicializa o cristal de 12mhz e troca o clock do sistema
@@ -71,6 +70,7 @@ void xosc_init(void)
 void uart_init(void)
 {
     RESETS_RESET &= ~RST_UART0;
+    while (!(RESETS_RESET_DONE & RST_UART0)); 
    
     GPIO0_CTRL = FUNC_UART;
     GPIO1_CTRL = FUNC_UART;
@@ -84,8 +84,16 @@ void uart_init(void)
     UART0_CR = (1 << 0) | (1 << 8) | (1 << 9);
 }
 
-// envio de char (bloqueante)
-void uart_putc(char data)
+char uart_getc(void) // recebimento de dados
+{
+
+    while (UART0_FR & RXFE_BIT);
+
+    return (char)(UART0_DR & 0XFF);
+}
+
+
+void uart_putc(char data) // envio de dados
 {
     // espera se a fifo estiver cheia
     while (UART0_FR & TXFF_BIT); 
@@ -94,6 +102,7 @@ void uart_putc(char data)
 
 int main(void)
 {
+    xosc_init();
     
     uint32_t rst = (RST_IO_BANK0 | RST_PADS_BANK0);
     RESETS_RESET &= ~rst;
@@ -105,9 +114,10 @@ int main(void)
     uart_init();
     
     while (1)
-    {
-        uart_putc('U');
+    { 
         GPIO_OUT_XOR = (1u << LED);
-        for (volatile uint32_t i = 0; i < 5000000; i++);
+        
+        char recebido = uart_getc(); 
+        uart_putc(recebido);
     }
 }

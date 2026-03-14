@@ -1,29 +1,21 @@
-# só imprime o que chega
-
-
-import serial 
-import sys
-
-PORTA = '/dev/ttyUSB0' 
-
+import serial
+import time
 
 try:
-    porta = sys.argv[1] if len(sys.argv) > 1 else PORTA
-    
-    print(f"[*] Abrindo porta {porta} a 115200 baud...")
-    ser = serial.Serial(porta, 115200, timeout=1)
-    
-    print("[*] Conectado! Aguardando dados (Ctrl+C para sair)...")
+    # Abre a porta bruta. 
+    ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1) 
+    print("Conexão estabelecida. Disparando...")
     
     while True:
-        dado = ser.read(1)
+        ser.write(b'U') 
         
-        if dado:
-            # Mostra o byte cru (Hex) e a representação ASCII
-            print(f"Byte: {dado.hex().upper()} | ASCII: {dado}")
+        resposta = ser.read(1) 
+        if resposta:
+            print(f"Resposta: {resposta.hex().upper()}")
+        else:
+            print("Microcontrolador mudo...")
             
-except serial.SerialException as e:
-    print(f"[!] Erro ao abrir serial: {e}")
-    print("verifique se a porta está certa e se o Pico está plugado.")
-except KeyboardInterrupt:
-    print("\n[*] Encerrando teste.")
+        time.sleep(0.5) # Atraso para você conseguir ler a tela
+        
+except Exception as e:
+    print(f"Falha de ambiente operacional: {e}")

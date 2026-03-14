@@ -123,7 +123,7 @@ Implementar uma stack USB bare-metal desviaria o foco da engenharia reversa do a
 
 ---
 
-## 🔄 Decisão Arquitetural: Migração para Modelo Híbrido
+## 🔄 Migração para Modelo Híbrido
 
 A partir das limitações observadas, o projeto evoluiu para uma arquitetura híbrida na branch `main`:
 
@@ -148,4 +148,4 @@ Esta branch representa:
 - Referência educacional e técnica
 - Fundamento estrutural do projeto principal
 
-> Não é código descartado, é a fundação sobre a qual a arquitetura híbrida foi construída.
+> A fundação sobre a qual a arquitetura híbrida foi construída.
