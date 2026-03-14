@@ -55,7 +55,7 @@
 #define RXFE_BIT      (1 << 4)
 
 #define CLK_PERI  12000000
-#define BAUD_RATE 115200
+#define BAUD_RATE 460800
 
 // inicializa o cristal de 12mhz e troca o clock do sistema
 void xosc_init(void)
@@ -110,6 +110,11 @@ int main(void)
 
     GPIO25_CTRL = FUNC_SIO;
     GPIO_OE_SET = (1u << LED);
+    
+    for(int j=0; j<6; j++) {
+        GPIO_OUT_XOR = (1u << LED);
+        for (volatile uint32_t i = 0; i < 1000000; i++);
+    }
     
     uart_init();
     
