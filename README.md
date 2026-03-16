@@ -21,9 +21,9 @@ O objetivo desta etapa foi validar domínio completo sobre:
 
 | Diretório | Descrição |
 |------------|------------|
-| `src/` | Código C e Assembly: `start.s` (Reset Handler), `main.c` (drivers MMIO), `boot2_w25q080.S` (estágio 2 do boot). |
+| `src/` | Código C e Assembly: `start.s` (Reset Handler), `main.c` (drivers MMIO), `boot2_w25q080.S` (estágio 2 do boot), `boot2_final.s. |
 | `linker/` | `memmap.ld` — definição explícita de FLASH/RAM, símbolos do runtime e posicionamento fixo das seções. |
-| `tools/` | `maker.py` — geração determinística do `boot2` (padding + CRC32) e ferramentas auxiliares de teste. |
+| `tools/` | `boot2.bin`, `test_uart.py`, `uf2conv.py`, `uf2families.json` . |
 
 ---
 
@@ -91,7 +91,7 @@ Os testes foram conduzidos incrementalmente:
 - ✔️ Validação de layout de memória via `readelf` e `objdump`
 - ✔️ Verificação matemática de VMA/LMA
 - ✔️ Geração determinística do `boot2` com CRC32
-- 🔄 Teste de UART realizado por etapas (clocks, reset, mux, baud)
+- 🔄 Teste de UART realizado por etapas (reset, mux, baud)
 
 > O código pode conter trechos temporariamente comentados durante validações isoladas de cada subsistema.
 

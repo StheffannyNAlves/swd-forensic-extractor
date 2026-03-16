@@ -55,7 +55,7 @@
 #define RXFE_BIT      (1 << 4)
 
 #define CLK_PERI  12000000
-#define BAUD_RATE 460800
+#define BAUD_RATE 115200
 
 // inicializa o cristal de 12mhz e troca o clock do sistema
 void xosc_init(void)
