@@ -27,10 +27,16 @@ add_executable(firmware.elf
 # libgcc (div/mod helpers etc.)
 target_link_libraries(firmware.elf -lgcc)
 
-# Generate flat binary
+# Generate flat binary and automatically convert to UF2
 add_custom_command(TARGET firmware.elf POST_BUILD
     COMMAND arm-none-eabi-objcopy -O binary
             $<TARGET_FILE:firmware.elf>
             ${CMAKE_CURRENT_BINARY_DIR}/firmware.bin
-    COMMENT ">>> Gerando firmware.bin <<<"
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/uf2conv.py 
+            -c ${CMAKE_CURRENT_BINARY_DIR}/firmware.bin 
+            -b 0x10000000 
+            -f 0xe48bff56 
+            -o ${CMAKE_CURRENT_BINARY_DIR}/firmware.uf2
+    COMMENT ">>> Gerando firmware.bin e empacotando para UF2 <<<"
+    VERBATIM
 )
