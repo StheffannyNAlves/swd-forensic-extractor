@@ -22,6 +22,7 @@
 
 #define CLK_REF_CTRL  *(volatile uint32_t *) (CLOCKS_BASE + 0x30)
 #define CLK_SYS_CTRL  *(volatile uint32_t *) (CLOCKS_BASE + 0x3C)
+#define CLK_PERI_CTRL *(volatile uint32_t *) (CLOCKS_BASE + 0x48)
 #define SRC_XOSC      2 
 #define SRC_AUX       0
 
@@ -65,6 +66,8 @@ void xosc_init(void)
     while (!(XOSC_STATUS & STABLE_BIT));
     CLK_REF_CTRL = SRC_XOSC; 
     CLK_SYS_CTRL = SRC_AUX; 
+
+    CLK_PERI_CTRL = (1 << 11);
 }
 
 void uart_init(void)
@@ -122,7 +125,11 @@ int main(void)
     { 
         GPIO_OUT_XOR = (1u << LED);
         
-        char recebido = uart_getc(); 
-        uart_putc(recebido);
+        // Transmite a letra 'U' (Hex: 0x55, Binário: 01010101)
+        // Isso gera uma onda quadrada perfeita para medir no osciloscópio
+        uart_putc('U'); 
+        
+        // Um delay rudimentar para não afogar o Hantek e ver o LED piscar
+        for (volatile uint32_t i = 0; i < 500000; i++); 
     }
 }
