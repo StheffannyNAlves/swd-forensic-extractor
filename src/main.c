@@ -123,13 +123,12 @@ int main(void)
     
     while (1)
     { 
-        GPIO_OUT_XOR = (1u << LED);
+        uart_putc('S');
+        uart_putc('W');
+        uart_putc('D');
+        uart_putc('\n');
         
-        // Transmite a letra 'U' (Hex: 0x55, Binário: 01010101)
-        // Isso gera uma onda quadrada perfeita para medir no osciloscópio
-        uart_putc('U'); 
-        
-        // Um delay rudimentar para não afogar o Hantek e ver o LED piscar
-        for (volatile uint32_t i = 0; i < 500000; i++); 
+    
+        for (volatile uint32_t i = 0; i < 4000; i++); 
     }
 }
