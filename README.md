@@ -21,8 +21,8 @@ O projeto ativo (**Sonda Forense SWD**) está na branch `main`.
 
 | Diretório | Descrição |
 |-----------|-----------|
-| `src/` | Código C e Assembly: `start.s` (Reset Handler), `main.c` (drivers MMIO), `boot2_w25q080.S` / `boot2_final.S` (estágio 2 do boot). |
-| `linker/` | `memmap.ld` — definição explícita de FLASH/RAM, símbolos do runtime e posicionamento fixo das seções. |
+| `src/` | Código C e Assembly: `start.s` (Reset Handler), `main.c` (drivers MMIO), `boot2_final.S` (acessa o boot2.bin). |
+| `linker/` | `memmap.ld`: definição explícita de FLASH/RAM, símbolos do runtime e posicionamento fixo das seções. |
 | `tools/` | Artefatos e scripts auxiliares: `boot2.bin`, `test_uart.py`, `uf2conv.py`, `uf2families.json`. |
 
 ---
