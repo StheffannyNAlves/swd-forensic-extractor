@@ -37,7 +37,7 @@
 
 
 #define GPIO0_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x004) // Tx
-#define GPIO13_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x06c) // Rx, é necessario corrigir o offset
+#define GPIO13_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x06c) // Rx
 #define GPIO25_CTRL   *(volatile uint32_t *) (IO_BANK0_BASE + 0x0CC) // LED
 #define FUNC_UART     2
 #define FUNC_SIO      5
