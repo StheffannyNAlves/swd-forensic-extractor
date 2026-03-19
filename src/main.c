@@ -37,7 +37,7 @@
 
 
 #define GPIO0_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x004) // Tx
-#define GPIO1_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x00c) // Rx
+#define GPIO13_CTRL    *(volatile uint32_t *) (IO_BANK0_BASE + 0x06c) // Rx, é necessario corrigir o offset
 #define GPIO25_CTRL   *(volatile uint32_t *) (IO_BANK0_BASE + 0x0CC) // LED
 #define FUNC_UART     2
 #define FUNC_SIO      5
@@ -76,7 +76,7 @@ void uart_init(void)
     while (!(RESETS_RESET_DONE & RST_UART0)); 
    
     GPIO0_CTRL = FUNC_UART;
-    GPIO1_CTRL = FUNC_UART;
+    GPIO13_CTRL = FUNC_UART;
 
     uint32_t div_x64 = ((CLK_PERI * 4) + (BAUD_RATE / 2)) / BAUD_RATE;
 
@@ -86,6 +86,11 @@ void uart_init(void)
     UART0_LCR_H = (1 << 4) | (3 << 5);
     UART0_CR = (1 << 0) | (1 << 8) | (1 << 9);
 }
+
+bool uartrx_disponivel(void){
+    return !(UART0_FR & RXFE_BIT);
+}
+
 
 char uart_getc(void) // recebimento de dados
 {
@@ -101,6 +106,19 @@ void uart_putc(char data) // envio de dados
     // espera se a fifo estiver cheia
     while (UART0_FR & TXFF_BIT); 
     UART0_DR = data;
+}
+
+void uart_puts(const char *s){
+    while ( *s){
+        uart_putc(*s++);
+    }
+}
+
+static void delay(volatile uint32_t n)
+{
+    while (n--) {
+        __asm volatile ("nop");
+    }
 }
 
 int main(void)
@@ -123,12 +141,25 @@ int main(void)
     
     while (1)
     { 
-        uart_putc('S');
-        uart_putc('W');
-        uart_putc('D');
-        uart_putc('\n');
+        uart_puts("SWD\r\n");
+
+        delay(50000);
+
+
+        while (uartrx_disponivel()){
+            char c = uart_getc();
+
+            uart_putc('[');
+            uart_putc(c);
+            uart_putc(']');
+            uart_putc('\r');
+            uart_putc('\n');
+
+            if (c == 'L' || c == 'l'){
+                GPIO_OUT_XOR = (1u << LED);
+            }
+        }
+        delay(400000);
         
-    
-        for (volatile uint32_t i = 0; i < 4000; i++); 
     }
 }
