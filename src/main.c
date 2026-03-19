@@ -141,24 +141,20 @@ int main(void)
     
     while (1)
     { 
-        uart_puts("SWD\r\n");
+        uart_puts("S\r\n");
 
         delay(50000);
 
-
-        while (uartrx_disponivel()){
+        if (uartrx_disponivel()){
             char c = uart_getc();
 
-            uart_putc('[');
-            uart_putc(c);
-            uart_putc(']');
-            uart_putc('\r');
-            uart_putc('\n');
-
-            if (c == 'L' || c == 'l'){
+            if (c == 'S') {
+                uart_putc('N');
                 GPIO_OUT_XOR = (1u << LED);
             }
         }
+
+        
         delay(400000);
         
     }
