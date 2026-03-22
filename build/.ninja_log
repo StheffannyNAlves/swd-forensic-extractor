@@ -1,0 +1,5 @@
+# ninja log v5
+2	34	1773815656233993536	CMakeFiles/firmware.elf.dir/src/start.s.o	4914c55ff87aa8b1
+1	71	1773815675393276020	CMakeFiles/firmware.elf.dir/src/boot2_final.S.o	9477a3e9af8a067e
+1	48	1773945487127863743	CMakeFiles/firmware.elf.dir/src/main.c.o	bfe20fdc8dfa9b4
+48	138	1773945487141658153	firmware.elf	89b2605a12169638
