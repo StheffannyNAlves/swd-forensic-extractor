@@ -6,6 +6,22 @@
 			"compiler" : 
 			{
 				"id" : "GNU",
+				"implicit" : {},
+				"path" : "/usr/bin/gcc",
+				"version" : ""
+			},
+			"language" : "ASM",
+			"sourceFileExtensions" : 
+			[
+				"s",
+				"S",
+				"asm"
+			]
+		},
+		{
+			"compiler" : 
+			{
+				"id" : "GNU",
 				"implicit" : 
 				{
 					"includeDirectories" : 

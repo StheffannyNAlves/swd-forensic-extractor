@@ -931,7 +931,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "1"
+			"value" : "98"
 		},
 		{
 			"name" : "CMAKE_OBJCOPY",
@@ -1011,7 +1011,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "Project"
+			"value" : "p1_forensic_probe"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
