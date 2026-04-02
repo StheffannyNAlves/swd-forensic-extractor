@@ -5,6 +5,7 @@ include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 project(p1_forensic_probe C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 pico_sdk_init()
 
@@ -17,7 +18,9 @@ add_compile_options(
 
 set(FIRMWARE_SOURCES
     src/main.c
+    src/platform/platform_init.c
     src/transport/usb_transport.c
+    src/transport/usb_descriptors.c
 )
 
 add_executable(p1_forensic_probe ${FIRMWARE_SOURCES})
@@ -29,9 +32,12 @@ target_include_directories(p1_forensic_probe PRIVATE
 target_link_libraries(p1_forensic_probe
     pico_stdlib
     hardware_gpio
+    pico_multicore
     tinyusb_device
+    tinyusb_board
 )
 
 pico_enable_stdio_uart(p1_forensic_probe 0)
+pico_enable_stdio_usb(p1_forensic_probe 0)
 
 pico_add_extra_outputs(p1_forensic_probe)

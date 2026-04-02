@@ -1,0 +1,1 @@
+#include "platform/plataform_init.h"
