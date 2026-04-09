@@ -32,6 +32,7 @@ target_include_directories(p1_forensic_probe PRIVATE
 target_link_libraries(p1_forensic_probe
     pico_stdlib
     hardware_gpio
+    hardware_watchdog
     pico_multicore
     tinyusb_device
     tinyusb_board

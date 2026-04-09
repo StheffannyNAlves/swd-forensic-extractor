@@ -1,6 +1,6 @@
 #include "platform/platform_init.h"
 #include "platform/board_config.h"
-
+#include "hardware/watchdog.h"
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 
@@ -53,6 +53,7 @@ static void _configure_led(void)
 }
 
 static void _configure_watchdog(void){
+    watchdog_enable(1000, true);
 
 }
 
