@@ -7,21 +7,10 @@
 #include <stdio.h>
 
 /**
- * platform_init.c
- *
- * Implementação da inicialização da plataforma da sonda.
- *
- * Decisões de engenharia:
- *  - stdio_init_all() habilita UART e USB stdio do SDK; útil para
- *    debug inicial via minicom antes da CDC própria estar pronta.
- *  - O pino RUN do alvo é configurado como saída e colocado em LOW
- *    imediatamente, mantendo o alvo em reset desde o boot da sonda.
- *    Isso garante que o alvo nunca sai do reset sem autorização explícita
- *    da FSM — princípio de segurança por padrão.
- *  - Os pinos SWD são configurados aqui como entrada (hi-z) com
- *    pull-up habilitado. Eles ficam passivos até que a camada SWD
- *    (Fase 2) os assuma. Isso evita glitches indesejados no barramento
- *    enquanto o alvo está em reset.
+ * Implementação da inicialização da plataforma.
+ * - stdio_init_all() para debug UART/USB
+ * - Pino RUN em LOW (alvo em reset, segurança padrão)
+ * - Pinos SWD como entrada com pull-up (passivos até Fase 2)
  */
 
 
@@ -29,17 +18,17 @@ static void _configure_run_pin(void)
 {
     gpio_init(PIN_TARGET_RUN);
     gpio_set_dir(PIN_TARGET_RUN, GPIO_OUT);
-    gpio_put(PIN_TARGET_RUN, TARGET_IN_RESET);   /* alvo em reset desde o boot */
+    gpio_put(PIN_TARGET_RUN, TARGET_IN_RESET);   /* reset padrão */
 }
 
 static void _configure_swd_pins_passive(void)
 {
-    /* SWCLK: saída, começa LOW */
+    /* SWCLK: saída LOW */
     gpio_init(PIN_SWCLK);
     gpio_set_dir(PIN_SWCLK, GPIO_OUT);
     gpio_put(PIN_SWCLK, 0); 
 
-    /* SWDIO: entrada com pull-up (hi-z seguro enquanto SWD inativo) */
+    /* SWDIO: entrada com pull-up (hi-z, SWD inativo) */
     gpio_init(PIN_SWDIO);
     gpio_set_dir(PIN_SWDIO, GPIO_IN);
     gpio_pull_up(PIN_SWDIO);
@@ -57,7 +46,7 @@ static void _configure_watchdog(void){
 
 }
 
-// API publica
+/* API pública */
 bool platform_init(void)
 {
 
