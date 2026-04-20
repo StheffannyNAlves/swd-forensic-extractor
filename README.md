@@ -12,7 +12,7 @@
 
 ## O que é este projeto
 
-O **P1** transforma um Raspberry Pi Pico (Sonda) em um extrator forense capaz de adquirir **2 MB de firmware em menos de 60 segundos**, com validação criptográfica SHA-256 e registro estruturado da sessão — sem depender de nenhuma ferramenta de debug convencional (CMSIS-DAP, OpenOCD, picotool).
+O **P1** transforma um Raspberry Pi Pico (Sonda) em um extrator forense capaz de adquirir **2 MB de firmware em menos de 60 segundos**, com validação criptográfica SHA-256 e registro estruturado da sessão, sem depender de nenhuma ferramenta de debug convencional (CMSIS-DAP, OpenOCD, picotool).
 
 O diferencial não está apenas em implementar SWD sem biblioteca pronta. Está em tratar a extração como uma **operação forense**: integridade verificável, política explícita de não-modificação do alvo e evidência auditável do processo.
 
@@ -70,7 +70,7 @@ O projeto adota uma arquitetura híbrida onde cada camada tem uma justificativa 
 ### Decisões de design
 
 **Por que bit-banging em C e não PIO?**
-O RP2040 tem PIO que poderia gerar o clock SWD com precisão de ciclo. A escolha pelo bit-banging foi deliberada: o objetivo é controlar e auditar explicitamente cada bit do protocolo. PIO delegaria esse controle para microinstruções — correto para produção, opaco para fins forenses.
+O RP2040 tem PIO que poderia gerar o clock SWD com precisão de ciclo. A escolha pelo bit-banging foi deliberada: o objetivo é controlar e auditar explicitamente cada bit do protocolo. PIO delegaria esse controle para microinstruções, correto para produção, opaco para fins forenses.
 
 **Por que registradores SIO diretos e não `gpio_put()`?**
 `gpio_put()` faz leitura-modificação-escrita internamente. Uma interrupção do TinyUSB entre a leitura e a escrita corrompe o estado do pino silenciosamente. Os registradores `GPIO_OUT_SET`/`CLR` e `GPIO_OE_SET`/`CLR` do SIO são atômicos — uma escrita altera apenas os bits da máscara, sem janela para corrupção.
