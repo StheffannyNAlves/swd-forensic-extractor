@@ -1,4 +1,4 @@
-# P1 — SWD Forensic Extractor
+# Projeto Dolos — SWD Forensic Extractor
 
 ![Status](https://img.shields.io/badge/Status-Sprint_1_(Foundation)-blue)
 ![Platform](https://img.shields.io/badge/Platform-RP2040-c51a4a?logo=raspberry-pi)
