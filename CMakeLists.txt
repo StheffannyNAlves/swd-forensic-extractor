@@ -34,8 +34,6 @@ target_link_libraries(p1_forensic_probe
     hardware_gpio
     hardware_watchdog
     pico_multicore
-    tinyusb_device
-    tinyusb_board
 )
 
 pico_enable_stdio_uart(p1_forensic_probe 0)
