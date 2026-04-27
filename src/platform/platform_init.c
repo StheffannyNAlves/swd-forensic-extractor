@@ -3,32 +3,22 @@
 #include "hardware/watchdog.h"
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
-
 #include <stdio.h>
 
-/**
- * Implementação da inicialização da plataforma.
- * - stdio_init_all() para debug UART/USB
- * - Pino RUN em LOW (alvo em reset, segurança padrão)
- * - Pinos SWD como entrada com pull-up (passivos até Fase 2)
- */
 
 
 static void _configure_run_pin(void)
 {
     gpio_init(PIN_TARGET_RUN);
     gpio_set_dir(PIN_TARGET_RUN, GPIO_OUT);
-    gpio_put(PIN_TARGET_RUN, TARGET_IN_RESET);   /* reset padrão */
+    gpio_put(PIN_TARGET_RUN, TARGET_IN_RESET);   
 }
 
 static void _configure_swd_pins_passive(void)
-{
-    /* SWCLK: saída LOW */
-    gpio_init(PIN_SWCLK);
+{    gpio_init(PIN_SWCLK);
     gpio_set_dir(PIN_SWCLK, GPIO_OUT);
     gpio_put(PIN_SWCLK, 0); 
 
-    /* SWDIO: entrada com pull-up (hi-z, SWD inativo) */
     gpio_init(PIN_SWDIO);
     gpio_set_dir(PIN_SWDIO, GPIO_IN);
     gpio_pull_up(PIN_SWDIO);

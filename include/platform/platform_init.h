@@ -4,10 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/**
- * Inicialização da plataforma: clocks, GPIOs, estado seguro.
- * Deve ser chamada uma única vez no início do main().
- */
+
 
 /**
  * @brief Inicializa plataforma: Pico SDK, GPIOs, alvo em reset.
