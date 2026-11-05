@@ -15,6 +15,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 # FASE 1 — Ativo desde o início
 
 jobs:
@@ -29,6 +32,7 @@ jobs:
       - name: Checkout com submodules
         uses: actions/checkout@v4
         with:
+          persist-credentials: false
           submodules: recursive
 
       - name: Instalar toolchain ARM + CMake
@@ -74,6 +78,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Instalar clang-format
         run: sudo apt-get install -y clang-format
@@ -101,6 +107,8 @@ jobs:
 #    steps:
 #      - name: Checkout
 #        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 #
 #      - name: Instalar Python
 #        uses: actions/setup-python@v5
@@ -127,6 +135,8 @@ jobs:
 #    steps:
 #      - name: Checkout
 #        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 #        with:
 #          submodules: recursive
 #
