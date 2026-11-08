@@ -1,30 +1,27 @@
-// Core 0
-// Responsible for providing visual feedback on the target's status.
+// Core 0: control of the target's active-low RUN pin and probe LED.
 #include "target/target_ctrl.h"
 #include "hardware/gpio.h"
 #include "platform/board_config.h"
 
-#define GPIO_OUT_SET *(volatile uint32_t *)(SIO_BASE + 0x014)
-#define GPIO_OE_SET *(volatile uint32_t *)(SIO_BASE + 0x024)
-#define GPIO_OUT_CLR *(volatile uint32_t *)(SIO_BASE + 0x018)
-
 void target_ctrl_init(void) {
-    gpio_init(PIN_RUN);
-    gpio_init(PIN_RST);
-    gpio_init(PIN_PROBE_LED);
+    // RUN is active low. Preload a safe HIGH output level before enabling it.
+    gpio_init(PIN_TARGET_RUN);
+    gpio_put(PIN_TARGET_RUN, TARGET_RUNNING);
+    gpio_set_dir(PIN_TARGET_RUN, GPIO_OUT);
 
-    GPIO_OE_SET = (1 << PIN_RUN | 1 << PIN_PROBE_LED | 1 << PIN_RST);
-    GPIO_OUT_CLR = (1 << PIN_RUN);
-    GPIO_OUT_SET = (1 << PIN_RST);
-    GPIO_OUT_CLR = (1 << PIN_PROBE_LED);
+    gpio_init(PIN_PROBE_LED);
+    gpio_put(PIN_PROBE_LED, LED_OFF);
+    gpio_set_dir(PIN_PROBE_LED, GPIO_OUT);
 }
 
 void target_reset_low(void) {
-    GPIO_OUT_SET = (1 << PIN_RST);
-    GPIO_OUT_CLR = (1 << PIN_PROBE_LED);
+    // Assert reset: hold the target RP2040's RUN pin LOW.
+    gpio_put(PIN_TARGET_RUN, TARGET_IN_RESET);
+    gpio_put(PIN_PROBE_LED, LED_OFF);
 }
 
 void target_reset_high(void) {
-    GPIO_OUT_CLR = (1 << PIN_RST);
-    GPIO_OUT_SET = (1 << PIN_PROBE_LED);
+    // Release reset: allow the target to execute.
+    gpio_put(PIN_TARGET_RUN, TARGET_RUNNING);
+    gpio_put(PIN_PROBE_LED, LED_ON);
 }
