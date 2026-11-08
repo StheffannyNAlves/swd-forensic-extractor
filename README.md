@@ -1,18 +1,18 @@
 # Projeto Dolos — SWD Forensic Extractor
 
-![Status](https://img.shields.io/badge/Status-Sprint_1_(Foundation)-blue)
+![Status](https://img.shields.io/badge/Status-Em_desenvolvimento-yellow)
 ![Platform](https://img.shields.io/badge/Platform-RP2040-c51a4a?logo=raspberry-pi)
 ![Language](https://img.shields.io/badge/Language-C_(bare--metal_híbrido)-00599C?logo=c)
 ![Toolchain](https://img.shields.io/badge/Toolchain-arm--none--eabi--gcc_13.2-orange)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-> Ferramenta de aquisição bare-metal que extrai e valida o conteúdo da memória Flash de um RP2040 alvo via protocolo SWD, usando outro RP2040 como sonda.
+> Protótipo de sonda RP2040 para comunicação SWD com outro RP2040, com objetivo futuro de aquisição forense verificável de firmware.
 
 ---
 
 ## O que é este projeto
 
-O **Dolos** transforma um Raspberry Pi Pico (Sonda) em um extrator forense capaz de adquirir **2 MB de firmware em menos de 60 segundos**, com validação criptográfica SHA-256 e registro estruturado da sessão, sem depender de nenhuma ferramenta de debug convencional (CMSIS-DAP, OpenOCD, picotool).
+O **Dolos** pretende transformar um Raspberry Pi Pico (sonda) em uma ferramenta de aquisição forense de firmware via SWD, sem depender de CMSIS-DAP, OpenOCD ou picotool para a comunicação. **A extração de 2 MB, a meta de menos de 60 segundos, o SHA-256 e o registro auditável ainda não estão implementados ou validados.**
 
 O diferencial não está apenas em implementar SWD sem biblioteca pronta. Está em tratar a extração como uma **"operação forense"**: integridade verificável, política explícita de não-modificação do alvo e evidência auditável do processo.
 
@@ -38,6 +38,8 @@ Fundação da sonda validada: ambiente de build, firmware modular, USB CDC funci
 
 ### Fase 2 — Em andamento
 
+**Atenção:** os itens marcados descrevem rotinas presentes no código, não uma sessão SWD ponta a ponta validada. Os sinais e tempos ainda precisam de verificação instrumental.
+
 Implementação da camada física SWD em assembly ARM via SIO e início da camada de protocolo.
 
 - [x] `swd_phy_init`: inicialização de GPIO_OE e estado inicial dos pinos
@@ -54,7 +56,7 @@ Implementação da camada física SWD em assembly ARM via SIO e início da camad
 
 ## Arquitetura
 
-O projeto adota uma arquitetura híbrida onde cada camada tem uma justificativa técnica explícita.
+O diagrama abaixo representa a **arquitetura desejada**, não o estado completo do firmware. A base USB e de controle do alvo já existe; multicore, protocolo DAP, extração e registro forense ainda são etapas futuras.
 
 ```mermaid
 flowchart TD
@@ -111,12 +113,12 @@ flowchart TD
     class ALVO,HOST ext
 ```
 
-### Decisões de design
+### Arquitetura proposta e decisões de design
 
 **Por que bit-banging em Assembly e não PIO ou C?**
   O pino `SWDCLK` opera de forma simétrica com atrasos calculados ciclo a ciclo via `NOPs`. Implementar em C delegaria o timing ao compilador, gerando instabilidade. O PIO automatizaria o processo, mas a implementação em Assembly ARM puro garante o controle cirúrgico e o determinismo necessários para auditoria forense.
-**Por que isolamento multicore (Core 1 vs Core 0)?**
-  Rotinas de exibição ou stacks de comunicação (como TinyUSB) possuem latências imprevisíveis de milissegundos. No Core 1, o barramento roda com **zero interrupções** e acesso exclusivo aos pinos via bloco **SIO (Single-cycle IO)** conectado ao barramento IOPORT do Cortex-M0+, garantindo escritas atômicas e livres de jitter de crossbar.
+**Por que planejar isolamento multicore (Core 1 vs Core 0)?**
+  A separação entre SWD e USB poderia reduzir interferências temporais, mas **a execução em dois núcleos ainda não está implementada**. Latências, jitter e sincronização entre núcleos precisarão ser medidos.
 **Por que o pino RUN é controlado sob Reset?**
   Ao segurar a linha `RUN` do alvo em LOW antes da inicialização, a sonda impede o processador alvo de executar código local malicioso ou de reconfigurar os registradores do subsistema QSPI, assumindo o controle do silício a partir de um estado virgem e previsível.
 
@@ -124,7 +126,7 @@ flowchart TD
 
 ## Robustez e Tratamento de Erros (LUT)
 
-O gerenciamento de falhas do sistema é centralizado em uma **Look-Up Table (LUT) estática** armazenada em Flash. Toda transição de erro na FSM passa obrigatoriamente pela função unificada `error_policy(code)`.
+**Planejado, não implementado:** gerenciamento de falhas por tabela estática (LUT) com uma função `error_policy(code)`. O código atual ainda não executa essa política.
 
 As falhas são categorizadas por severidade, disparando reações determinísticas imediatas:
 -`ACTION_RETRY`: Reexecução de operações (ex: colisões de `ACK_WAIT`).
@@ -135,7 +137,7 @@ As falhas são categorizadas por severidade, disparando reações determinístic
 
 ## Política de integridade: Safe-Read
 
-A sonda opera sob um modelo de **Safe-Read forçado por software**. Após o handshake inicial e a configuração estrita do subsistema QSPI/XIP do alvo, o firmware bloqueia qualquer envio de payloads de escrita. Qualquer tentativa de desvio ou comando não autorizado aborta a sessão imediatamente (`ST_ABORT`), invalidando o token de sessão criptográfico gerado no boot.
+**Objetivo futuro, ainda não implementado:** uma política de aquisição com limitação explícita de operações de escrita, logs auditáveis e verificação de integridade. No estado atual, **não há garantias implementadas de Safe-Read, token criptográfico ou extração sem alteração do alvo**.
 
 ---
 
@@ -174,14 +176,13 @@ A sonda opera sob um modelo de **Safe-Read forçado por software**. Após o hand
 
 ```bash
 git clone https://github.com/StheffannyNAlves/swd-forensic-extractor.git
-cd swd-forensic-extractor/firmware
-
-mkdir build && cd build
-cmake ..
-make -j$(nproc)
+cd swd-forensic-extractor
+git submodule update --init --recursive
+cmake -S . -B build
+cmake --build build --parallel
 ```
 
-Para flashar: segure BOOTSEL no Pico sonda, conecte o USB e copie `dolos.uf2` para o drive que aparecer.
+Para gravar: segure BOOTSEL na Pico sonda, conecte o USB e copie `build/dolos.uf2` para a unidade que aparecer.
 
 ---
 
