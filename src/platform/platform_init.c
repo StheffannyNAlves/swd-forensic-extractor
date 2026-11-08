@@ -5,25 +5,15 @@
 #include "platform/board_config.h"
 #include <stdio.h>
 
-static void _configure_run_pin(void) {
+static void configure_run_pin(void) {
     gpio_init(PIN_TARGET_RUN);
     gpio_set_dir(PIN_TARGET_RUN, GPIO_OUT);
     gpio_put(PIN_TARGET_RUN, TARGET_IN_RESET);
 }
 
-static void _configure_swd_pins_passive(
-    void) // Passive state means "the pin exists but the probe is not driving the bus yet."
-{
-    gpio_init(PIN_SWCLK); // Passive during initial testing.
-    gpio_set_dir(PIN_SWCLK, GPIO_OUT);
-    gpio_put(PIN_SWCLK, 0);
 
-    gpio_init(PIN_SWDIO);
-    gpio_set_dir(PIN_SWDIO, GPIO_IN);
-    gpio_pull_up(PIN_SWDIO);
-}
 
-static void _configure_led(void) {
+static void configure_led(void) {
     gpio_init(PIN_PROBE_LED);
     gpio_set_dir(PIN_PROBE_LED, GPIO_OUT);
     gpio_put(PIN_PROBE_LED, LED_OFF);
@@ -35,9 +25,8 @@ bool platform_init(void) {
 
     stdio_init_all();
 
-    _configure_led();
-    _configure_run_pin();
-    _configure_swd_pins_passive();
+    configure_led();
+    configure_run_pin();
 
     sleep_ms(10);
 

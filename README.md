@@ -1,6 +1,6 @@
 # Projeto Dolos — SWD Forensic Extractor
 
-![Status](https://img.shields.io/badge/Status-Sprint_1_(Foundation)-blue)
+![Status](https://img.shields.io/badge/Status-Sprint_2-blue)
 ![Platform](https://img.shields.io/badge/Platform-RP2040-c51a4a?logo=raspberry-pi)
 ![Language](https://img.shields.io/badge/Language-C_(bare--metal_híbrido)-00599C?logo=c)
 ![Toolchain](https://img.shields.io/badge/Toolchain-arm--none--eabi--gcc_13.2-orange)
@@ -46,8 +46,8 @@ Implementação da camada física SWD em assembly ARM via SIO e início da camad
 - [x] `turnaround_host_to_target` e `turnaround_target_to_host`
 - [x] `line_reset` — 50 ciclos HIGH via loop assembly
 - [x] `swd_enter_swd_mode` — sequência completa: line_reset → 0xE79E → line_reset → idle cycles
-- [ ] Validação no analisador lógico
-- [ ] Leitura do IDCODE
+- [X] Validação no analisador lógico
+- [] Leitura do IDCODE
 - [ ] Navegação DAP
 
 ---

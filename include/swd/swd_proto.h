@@ -7,6 +7,11 @@
 extern "C" {
 #endif
 
+#define CORE0_INSTANCE_ID  0x01002927
+#define CORE1_INSTANCE_ID  0x11002927
+#define RESCUE_INSTANCE_ID 0xF1002927
+
+void swd_phy_dir_out(void);
 /**
  * @brief Executes the full SWD entry sequence.
  * * Flow: line_reset -> 0xE79E -> line_reset -> 2 idle cycles.
@@ -46,6 +51,9 @@ uint8_t swd_write(uint8_t apndp, uint8_t a2, uint8_t a3, uint32_t data_to_write)
 uint32_t swd_read_idcode(void);
 
 void swd_wake_dormant(void);
+
+
+
 
 #ifdef __cplusplus
 }

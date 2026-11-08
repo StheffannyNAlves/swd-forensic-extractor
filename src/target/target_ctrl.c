@@ -21,11 +21,13 @@ void target_ctrl_init(void) {
 }
 
 void target_reset_low(void) {
-    GPIO_OUT_SET = (1 << PIN_TARGET_RUN);
+    // Força o pino RUN para GND (Alvo em RESET)
+    GPIO_OUT_CLR = (1 << PIN_TARGET_RUN);
     GPIO_OUT_CLR = (1 << PIN_PROBE_LED);
 }
 
 void target_reset_high(void) {
-    GPIO_OUT_CLR = (1 << PIN_TARGET_RUN);
+    // Força o pino RUN para 3.3V (Alvo BOOTA)
+    GPIO_OUT_SET = (1 << PIN_TARGET_RUN);
     GPIO_OUT_SET = (1 << PIN_PROBE_LED);
 }

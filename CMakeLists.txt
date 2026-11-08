@@ -25,9 +25,12 @@ set(FIRMWARE_SOURCES
     src/swd/swd_phy.S
     src/app/app.c
     src/display/lcd.c
+    src/core1/core1_tasks.c
+    src/core0/core0_tasks.c
 )
 
-add_executable(dolos ${FIRMWARE_SOURCES})
+add_executable(dolos ${FIRMWARE_SOURCES}
+    )
 
 target_include_directories(dolos PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include

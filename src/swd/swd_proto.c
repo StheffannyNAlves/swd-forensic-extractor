@@ -5,30 +5,29 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#define JTAG_TO_SWD_SEQ 0xE79E
+#include "hardware/structs/sio.h"
 
 void swd_enter_swd_mode(void) {
     swd_wake_dormant();
-    // 1. Line Reset Inicial
+
     line_reset();
 
-    // 2. Transição JTAG -> SWD (0xE79E LSB-first)
-    uint16_t sequence = JTAG_TO_SWD_SEQ;
-    for (int i = 0; i < 16; i++) {
-        uint8_t bit = (sequence >> i) & 1;
-        writebit(bit);
-    }
+    // Transição JTAG -> SWD (0xE79E LSB-first)  
+    // uint16_t sequence = JTAG_TO_SWD_SEQ;
+    // for (int i = 0; i < 16; i++) {
+    //     uint8_t bit = (sequence >> i) & 1;
+    //     writebit(bit);
+    // }
 
-    // 3. Line Reset Mandatório pós-chave
-    line_reset();
+    // // 3. Line Reset Mandatório pós-chave
+    // line_reset();
 
-    writebit(0); // Idle cycle 1
-    writebit(0); // Idle cycle 2
+    // writebit(0); // Idle cycle 1
+    // writebit(0); // Idle cycle 2
 
-    // 4. Seleção imediata do Core 0
-    swd_write_targetsel(0x01002927);
+    swd_write_targetsel(CORE0_INSTANCE_ID);
 
-    writebit(0); // Idle cycle após TARGETSEL
+    writebit(0); // Idle cycle antes da primeira transição
     writebit(0);
 }
 
@@ -39,26 +38,21 @@ static uint8_t calculate_parity(uint32_t apndp, uint8_t rnw, uint8_t a2, uint8_t
 
 static void send_request(uint8_t apndp, uint8_t rnw, uint8_t a2, uint8_t a3) {
     uint8_t request_packet = 0;
-
     uint8_t parity = calculate_parity(apndp, rnw, a2, a3);
 
-    // Build the byte by packing each bit into its exact position (LSB-first)
-    request_packet |= (1 << 0);      // bit 0: Start (sempre 1)
-    request_packet |= (apndp << 1);  // bit 1: APnDP (0 para DP, 1 para AP)
-    request_packet |= (rnw << 2);    // bit 2: RnW (0 para Escrita, 1 para Leitura)
-    request_packet |= (a2 << 3);     // bit 3: A[2]
-    request_packet |= (a3 << 4);     // bit 4: A[3]
-    request_packet |= (parity << 5); // bit 5: Parity calculada sobre os bits 1-4
-    request_packet |= (0 << 6);      // bit 6: Stop (sempre 0)
-    request_packet |= (1 << 7);      // bit 7: Park (sempre 1)
+    request_packet |= (1 << 0);      // Start
+    request_packet |= (apndp << 1);  // APnDP
+    request_packet |= (rnw << 2);    // RnW
+    request_packet |= (a2 << 3);     // A2
+    request_packet |= (a3 << 4);     // A3
+    request_packet |= (parity << 5); // Parity
+    request_packet |= (0 << 6);      // Stop
+    request_packet |= (1 << 7);      // Park
 
     for (int i = 0; i < 8; i++) {
-        uint8_t bit = (request_packet >> i) & 1;
-        writebit(bit);
+        writebit((request_packet >> i) & 1);
     }
-    char msg[32];
-    snprintf(msg, sizeof(msg), "REQ=0x%02X\r\n", request_packet);
-    transport_send_event((uint8_t *)msg, strlen(msg));
+    
 }
 
 static uint32_t read_data(void) {
@@ -83,22 +77,17 @@ static uint8_t calculate_data_parity(uint32_t data) {
     return parity;
 }
 
-// 1. writebit por writebit, envia 0xA5 (8 bits, LSB first)
-// 2. turnaround_host_to_target()
-// 3. lê 3 bits de ACK com readbit()
-// 4. se ACK == OK (0b001):
-//        lê 32 bits de data com readbit()
-//        lê 1 bit de paridade com readbit()
-//        turnaround_target_to_host()
-// 5. retorna o valor de 32 bits lido
+
 uint32_t swd_read(uint8_t apndp, uint8_t addr, uint8_t rnw) {
     send_request(apndp, rnw, (addr >> 2) & 1, (addr >> 3) & 1); // Envio do header
 
-    // Turnaround: Host to Target
     turnaround_host_to_target();
-    uint32_t oe = *(volatile uint32_t *)(0xD0000000 + 0x20);
 
-    printf("DBG:OE=0x%08lX\n", oe);
+    // Lê OE direto do registrador
+    uint32_t oe = *(volatile uint32_t *)(0xD0000000 + 0x020);
+    char oe_msg[32];
+    snprintf(oe_msg, sizeof(oe_msg), "OE=0x%08lX\r\n", oe);
+    transport_send_event((uint8_t*)oe_msg, strlen(oe_msg));
 
     uint8_t ack = 0;
     for (int i = 0; i < 3; i++) {
@@ -107,24 +96,24 @@ uint32_t swd_read(uint8_t apndp, uint8_t addr, uint8_t rnw) {
     char ack_msg[32];
     snprintf(ack_msg, sizeof(ack_msg), "ACK=%u\r\n", ack);
     transport_send_event((uint8_t *)ack_msg, strlen(ack_msg));
+    
     if (ack == 0b001) { // ACK OK
         uint32_t data = read_data();
         uint8_t parity = readbit();
 
-        // Turnaround: Target to Host
         turnaround_target_to_host();
 
         if (parity == calculate_data_parity(data)) {
-            printf("C000\n");
-            printf("IDCODE: 0x%08X\n", (unsigned int)data);
+            //printf("C000\n");
+            //printf("IDCODE: 0x%08X\n", (unsigned int)data);
             return data; // Return the read data
         } else {
-            printf("S003\n");  // Parity error
+            //printf("S003\n");  // Parity error
             return 0xFFFFFFFF; // Indicate error with a special value
         }
     } else {
         turnaround_target_to_host(); // Ensure we return to host mode even on ACK error
-        printf("S004\n");            // ACK error
+        //printf("S004\n");            // ACK error
         return 0xFFFFFFFF;           // Indicate error with a special value
     }
 }
@@ -149,44 +138,42 @@ uint8_t swd_write(uint8_t apndp, uint8_t a2, uint8_t a3, uint32_t data_to_write)
 
         return ack;
     }
-
+    turnaround_target_to_host();
     return ack; // aborta em caso de WAIT ou FAULT
 }
 
-void swd_write_targetsel(uint32_t target_id) {
-    // 1. Envia Header (DP, Write, Endereço 0x0C -> A2=1, A3=1)
-    send_request(0, 0, 1, 1);
+ 
 
-    // 2. Sonda solta a linha (Turnaround Host -> Target)
+
+void swd_write_targetsel(uint32_t target_id) {
+    // Envia Header (DP, Write, Endereço 0x0C)
+    send_request(0, 0, 1, 1); // 8 bits
+
+    //  Dummy Turnaround (Exatamente 1 ciclo)
+    // O Host solta a linha (passa o pino para INPUT) e dá um clock.
     turnaround_host_to_target();
 
-    // 3. Ignora o ACK (3 ciclos mudos)
-    // A sonda apenas fornece o clock, mas a linha SWDIO fica em alta impedância.
-    for (int i = 0; i < 3; i++) {
-        readbit(); // Lê o "vazio" elétrico da linha e descarta o retorno
-    }
+    // 3 clocks de ACK, lê os valores mas joga fora. Preciso disso aqui para gerar os clocks
+    readbit();
+    readbit();
+    readbit();
 
-    // 4. Sonda retoma o domínio do pino (Turnaround Target -> Host)
-    turnaround_target_to_host();
+    turnaround_target_to_host(); // Reassume SWDIO e SWCLK
 
-    // 5. Envia os 32 bits do Target ID
     write_data(target_id);
-
-    // 6. Envia 1 bit de paridade
     writebit(calculate_data_parity(target_id));
 }
-
 /**
  * @brief Tira o alvo do estado Dormant e força para o modo SWD.
  * Sequência corrigida e cravada nos 4 bits de ativação do padrão ARM CoreSight.
  */
 void swd_wake_dormant(void) {
-    // 1. Aborta transições pendentes (Mínimo de 8 ciclos em LOW)
+    // Aborta transições pendentes (Mínimo de 8 ciclos em LOW)
     for (int i = 0; i < 8; i++) {
         writebit(0);
     }
 
-    // 2. Selection Alert Sequence (128 bits - Chave de Hardware)
+    // Selection Alert Sequence (128 bits - Chave de Hardware)
     // Transmitido LSB-first.
     static const uint8_t alert_seq[16] = {0x92, 0xf3, 0x09, 0x62, 0x95, 0x2d, 0x85, 0x86,
                                           0xe9, 0xaf, 0xdd, 0xe3, 0xa2, 0x0e, 0xbc, 0x19};
@@ -197,14 +184,16 @@ void swd_wake_dormant(void) {
         }
     }
 
-    // 3. Break do Protocolo (4 ciclos de clock com a linha em LOW)
+    // Break do Protocolo (4 ciclos de clock com a linha em LOW)
     for (int i = 0; i < 4; i++) {
         writebit(0);
     }
 
-    // 4. Activation Code para SWD (Valor 0x1 em exatamente 4 bits, LSB-first)
-    // Vai cuspir sequencialmente na linha: 1, 0, 0, 0
-    for (int i = 0; i < 4; i++) {
-        writebit((0x01 >> i) & 1);
+    // Activation Code para SWD (Valor 0x1A em exatamente 8 bits, LSB-first)
+    // Vai cuspir sequencialmente na linha: 0,1,0,1,1,0,0,0  
+    for (int i = 0; i < 8; i++) {
+        writebit((0x1A >> i) & 1);
     }
 }
+
+
