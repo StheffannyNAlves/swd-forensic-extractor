@@ -188,10 +188,9 @@ turnaround_target_to_host:
 
 
 line_reset:
-    PUSH {r4, lr}
+    PUSH {r4, lr}  @ Preserve loop counter and return address.
 
     MOVS r4, #50
-    MOVS r5, #1
 
 line_reset_loop:
     MOVS r0, #1
@@ -200,5 +199,5 @@ line_reset_loop:
     SUBS r4, r4, #1
     BNE line_reset_loop
 
-    POP {r4, r5, pc}
+    POP {r4, pc}   @ Match PUSH {r4, lr}; do not corrupt the stack
     .ltorg
