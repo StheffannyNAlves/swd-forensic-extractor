@@ -153,11 +153,13 @@ As falhas são categorizadas por severidade, disparando reações determinístic
 
 ### Ligação Sonda → Alvo
 
+**Referência de montagem:** o [log de depuração da fase 2](https://github.com/StheffannyNAlves/swd-forensic-extractor/blob/fase2/docs/dolos_swd_debug_logphase2.md) registra GP14 como o GPIO da sonda fisicamente ligado ao RUN do alvo. Essa ligação deve ser conferida na montagem atual antes de energizar ou validar a comunicação. O GP22 citado em versões anteriores do README não corresponde à ligação registrada nesse log.
+
 | Sinal | GPIO Sonda | Componente | Pino Alvo | Função |
 | :------ | :---------- | :----------- | :---------- | :------- |
 | SWCLK | `GP2` | Fio direto | `SWCLK` | Clock SWD —> sempre saída |
 | SWDIO | `GP3` | Resistor **330 Ω** série | `SWDIO` | Dados bidirecionais |
-| RESET | `GP22` | Resistor **1 kΩ** série | `RUN` (pino 30) | Kill switch |
+| RESET | `GP14` (pino físico 19) | Resistor **1 kΩ** série | `RUN` (pino 30) | Kill switch |
 | GND | `GND` | Fio direto | `GND` | Referência comum —> obrigatório |
 
 ---
