@@ -168,9 +168,10 @@ void swd_write_targetsel(uint32_t target_id) {
  * Sequência corrigida e cravada nos 4 bits de ativação do padrão ARM CoreSight.
  */
 void swd_wake_dormant(void) {
-    // Aborta transições pendentes (Mínimo de 8 ciclos em LOW)
+    // Pelo menos 8 ciclos HIGH para abortar uma Selection Alert pendente.
+    // Referencia: OpenOCD swd_seq_dormant_to_swd / Raspberry Pi CMSIS DFP.
     for (int i = 0; i < 8; i++) {
-        writebit(0);
+        writebit(1);
     }
 
     // Selection Alert Sequence (128 bits - Chave de Hardware)
