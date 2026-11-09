@@ -119,10 +119,8 @@ void fsm_run() {
             target_reset_low();
             sleep_ms(10);
 
-            multicore_fifo_push_blocking(CMD_CORE1_ENTER_SWD);
-
-            
-
+            // O comando ENTER_SWD e enviado e confirmado apenas no estado ENTER_SWD.
+            // Nao deixar uma resposta pendente na FIFO antes de READ_IDCODE.
             target_reset_high(); // Libera o alvo
             busy_wait_us(1000);
 
