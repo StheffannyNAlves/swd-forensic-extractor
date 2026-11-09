@@ -8,6 +8,7 @@
 #include "hardware/structs/sio.h"
 
 void swd_enter_swd_mode(void) {
+    line_reset();
     swd_wake_dormant();
 
     line_reset();
@@ -170,7 +171,7 @@ void swd_write_targetsel(uint32_t target_id) {
 void swd_wake_dormant(void) {
     // Aborta transições pendentes (Mínimo de 8 ciclos em LOW)
     for (int i = 0; i < 8; i++) {
-        writebit(0);
+        writebit(1);
     }
 
     // Selection Alert Sequence (128 bits - Chave de Hardware)

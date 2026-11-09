@@ -119,7 +119,7 @@ void fsm_run() {
             target_reset_low();
             sleep_ms(10);
 
-            multicore_fifo_push_blocking(CMD_CORE1_ENTER_SWD);
+            // multicore_fifo_push_blocking(CMD_CORE1_ENTER_SWD); removido porque o ENTER_SWD já envia ele
 
             
 
